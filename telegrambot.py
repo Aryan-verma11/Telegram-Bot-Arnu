@@ -1,6 +1,6 @@
 import telebot
 import re
-Token="8030004533:AAHAPHOiNmt3Q26Cx37Xwv3VZ4_pnCVkIfc"
+Token="Api key"
 
 bot=telebot.TeleBot(Token)
 
