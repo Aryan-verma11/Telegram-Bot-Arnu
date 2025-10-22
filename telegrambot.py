@@ -1,36 +1,94 @@
 import telebot
 import re
-Token="Api key"
+import random
 
-bot=telebot.TeleBot(Token)
+# === Replace with your own bot token ===
+Token = "8030004533:AAHAPHOiNmt3Q26Cx37Xwv3VZ4_pnCVkIfc"
+bot = telebot.TeleBot(Token)
 
-@bot.message_handler(commands=['Start','Hii','Hello','hi','namasty','bonjour',]) #you can also add msg send by user (['start',/start])
+# =====================
+# COMMAND HANDLERS
+# =====================
+
+@bot.message_handler(commands=['start', 'hello', 'hi', 'namaste', 'bonjour'])
 def start(message):
-    bot.reply_to(message,"Welcome Welcome I Am a bot named arnu")
+    bot.reply_to(message, f"✨ Hey {message.from_user.first_name}! Welcome to *Arnu*, your Beauty + Math Bot 💄🧮", parse_mode='Markdown')
 
-@bot.message_handler(command=['help'])
-def start(message):
-    bot.reply_to(message,"""/start->Greeting
-                 /help-> Will give you all commands list
+@bot.message_handler(commands=['help'])
+def help_command(message):
+    bot.reply_to(message, """
+🤖 *Here are my commands:*
+/start - Greeting Message
+/help - Show all commands
+/beauty_tips - Get a random beauty tip 💋
+/inspire - Get a motivational quote 🌟
+/calc - Type a math expression to calculate 🔢
+/about - Know more about me 👑
+""", parse_mode='Markdown')
 
+@bot.message_handler(commands=['about'])
+def about(message):
+    bot.reply_to(message, "👑 I'm *Arnu*, created by a Beauty Influencer 💅 who loves glam & logic! 💄✨\nI can chat, calculate, inspire, and make your day fabulous 💖", parse_mode='Markdown')
 
+# =====================
+# RANDOM BEAUTY TIPS
+# =====================
 
+beauty_tips = [
+    "💧 Stay hydrated — beauty starts from within!",
+    "🧴 Always remove your makeup before bed!",
+    "🌸 Use sunscreen every day — your future self will thank you!",
+    "🍯 DIY honey masks can help keep your skin glowing!",
+    "💋 Blend your foundation with a beauty blender for a flawless finish!",
+    "🌿 Green tea helps detoxify your skin and soul!"
+]
 
-""")
+@bot.message_handler(commands=['beauty_tips'])
+def beauty(message):
+    tip = random.choice(beauty_tips)
+    bot.reply_to(message, tip)
 
+# =====================
+# MOTIVATIONAL QUOTES
+# =====================
 
-@bot.message_handler(func=lambda message: True)
+quotes = [
+    "✨ Believe in yourself and you’ll be unstoppable!",
+    "💪 You are beautiful, powerful, and capable!",
+    "🌟 Keep shining, the world needs your light!",
+    "💖 Makeup can enhance your face, but confidence enhances your soul!"
+]
+
+@bot.message_handler(commands=['inspire'])
+def inspire(message):
+    quote = random.choice(quotes)
+    bot.reply_to(message, quote)
+
+# =====================
+# CALCULATOR FEATURE
+# =====================
+
+@bot.message_handler(func=lambda message: re.match(r'^[0-9\+\-\*/\.\(\)\s]+$', message.text))
 def calc(message):
     try:
-        if re.match(r'^[0-9\+\-\*/\.\(\)\s]+$', message.text):
-            msg = eval(message.text)
-        else:
-            msg = "Please enter a valid math expression!"
+        result = eval(message.text)
+        bot.reply_to(message, f"🧮 Result: {result}")
     except Exception:
-        msg = "This can’t be evaluated!"
-    bot.reply_to(message, str(msg))
+        bot.reply_to(message, "⚠️ This can’t be evaluated! Please check your math expression.")
 
+# =====================
+# FALLBACK (GENERAL)
+# =====================
 
-print("Bot is running...")
+@bot.message_handler(func=lambda message: True)
+def fallback(message):
+    responses = [
+        "💬 Hmm… I didn’t get that! Try /help for commands.",
+        "👑 Oops! I only do glam & math — try /beauty_tips or /calc.",
+        "💖 You can always ask me for /inspire quotes or /beauty_tips!"
+    ]
+    bot.reply_to(message, random.choice(responses))
 
+# =====================
+print("🤖 Bot is running...")
 bot.polling()
